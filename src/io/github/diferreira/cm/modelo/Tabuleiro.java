@@ -24,6 +24,18 @@ public class Tabuleiro implements CampoObservador {
         sortearMinas();
     }
 
+    public void paraCadaCampo(Consumer<Campo> funcao) {
+        campos.forEach(funcao);
+    }
+
+    public int getLinhas() {
+        return linhas;
+    }
+
+    public int getColunas() {
+        return colunas;
+    }
+
     public void registrarObservador(Consumer<ResultadoEvento> observador) {
         observadores.add(observador);
     }
@@ -88,7 +100,7 @@ public class Tabuleiro implements CampoObservador {
     @Override
     public void eventoOcorreu(Campo campo, CampoEvento evento) {
         if (evento == CampoEvento.EXPLODIR) {
-        	mostrarMinas();
+            mostrarMinas();
             notificarObservadores(false);
         } else if (objetivoAlcancado()) {
             notificarObservadores(true);
@@ -96,6 +108,6 @@ public class Tabuleiro implements CampoObservador {
     }
 
     private void mostrarMinas() {
-        campos.stream().filter(Campo::isMinado).forEach(c -> c.setAberto(true));
+        campos.stream().filter(Campo::isMinado).filter(c -> !c.isMarcado()).forEach(c -> c.setAberto(true));
     }
 }
