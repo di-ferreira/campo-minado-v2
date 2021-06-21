@@ -26,10 +26,10 @@ public class Campo {
     }
 
     private void notificarObservadores(CampoEvento evento) {
-        observadores.stream().forEach(o -> o.eventoOcorreu(this, evento));
+        observadores.forEach(o -> o.eventoOcorreu(this, evento));
     }
 
-    boolean adicionarVizinho(Campo vizinho) {
+    void adicionarVizinho(Campo vizinho) {
 
         boolean linhaDiferente = linha != vizinho.linha;
         boolean colunaDiferente = coluna != vizinho.coluna;
@@ -39,14 +39,10 @@ public class Campo {
         int deltaColuna = Math.abs(coluna - vizinho.coluna);
         int deltaGeral = deltaColuna + deltaLinha;
 
-        if (deltaGeral == 1 && !diagonal) {
+        if (deltaGeral == 1) {
             vizinhos.add(vizinho);
-            return true;
         } else if (deltaGeral == 2 && diagonal) {
             vizinhos.add(vizinho);
-            return true;
-        } else {
-            return false;
         }
 
     }
@@ -63,23 +59,20 @@ public class Campo {
         }
     }
 
-    public boolean abrir() {
+    public void abrir() {
         if (!aberto && !marcado) {
             if (minado) {
                 notificarObservadores(CampoEvento.EXPLODIR);
-                return true;
+                return;
             }
 
-            setAberto(true);
+            setAberto();
 
             notificarObservadores(CampoEvento.ABRIR);
 
             if (vizinhancaSegura()) {
-                vizinhos.forEach(v -> v.abrir());
+                vizinhos.forEach(Campo::abrir);
             }
-            return true;
-        } else {
-            return false;
         }
 
     }
@@ -92,21 +85,12 @@ public class Campo {
         return marcado;
     }
 
-    public boolean isAberto() {
-        return aberto;
+    void setAberto() {
+        this.aberto = true;
+
+        notificarObservadores(CampoEvento.ABRIR);
     }
 
-    void setAberto(boolean aberto) {
-        this.aberto = aberto;
-
-        if (aberto) {
-            notificarObservadores(CampoEvento.ABRIR);
-        }
-    }
-
-    public boolean isFechado() {
-        return !isAberto();
-    }
 
     void minar() {
         minado = true;
@@ -116,13 +100,6 @@ public class Campo {
         return minado;
     }
 
-    public int getLinha() {
-        return linha;
-    }
-
-    public int getColuna() {
-        return coluna;
-    }
 
     boolean objetivoAlcancado() {
         boolean desvendado = !minado && aberto;
@@ -138,6 +115,7 @@ public class Campo {
         aberto = false;
         minado = false;
         marcado = false;
+        notificarObservadores(CampoEvento.REINICIAR);
     }
 
 }

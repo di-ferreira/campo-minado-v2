@@ -15,7 +15,7 @@ public class BotaoCampo extends JButton implements CampoObservador, MouseListene
     private final Color BG_MARCAR = new Color(8, 179, 247);
     private final Color BG_EXPLODIR = new Color(198, 66, 68);
     private final Color TEXTO_VERDE = new Color(0, 100, 0);
-    private Campo campo;
+    private final Campo campo;
 
     public BotaoCampo(Campo campo) {
         this.campo = campo;
@@ -30,22 +30,20 @@ public class BotaoCampo extends JButton implements CampoObservador, MouseListene
     @Override
     public void eventoOcorreu(Campo campo, CampoEvento evento) {
         switch (evento) {
-            case ABRIR:
-                aplicarEstiloAbrir();
-                break;
-            case MARCAR:
-                aplicarEstiloMarcar();
-                break;
-            case EXPLODIR:
-                aplicarEstiloExplodir();
-                break;
-            default:
-                aplicarEstiloPadrao();
+            case ABRIR -> aplicarEstiloAbrir();
+            case MARCAR -> aplicarEstiloMarcar();
+            case EXPLODIR -> aplicarEstiloExplodir();
+            default -> aplicarEstiloPadrao();
         }
+        SwingUtilities.invokeLater(()->{
+            repaint();
+            validate();
+        });
     }
 
     private void aplicarEstiloPadrao() {
         setBackground(BG_PADRAO);
+        setBorder(BorderFactory.createBevelBorder(0));
         setText("");
     }
 
@@ -90,10 +88,8 @@ public class BotaoCampo extends JButton implements CampoObservador, MouseListene
     public void mousePressed(MouseEvent e) {
         if (e.getButton() == 1) {
             campo.abrir();
-            System.out.println("Botão esquerdo");
         } else {
             campo.alternarMarcacao();
-            System.out.println("Botão direito");
         }
     }
 
